@@ -10,10 +10,10 @@ const SignUpPage = () => {
   const createUser = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
-    name: "test",
-    email: "test@gmail.com",
-    password: "12341234",
-    password_confirmation: "12341234",
+    name: "",
+    email: "",
+    password: "",
+    password_confirmation: "",
   });
 
   const handleChange = (e) => {
@@ -22,32 +22,24 @@ const SignUpPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-
+    const auth = getAuth();
     try {
-      const auth = getAuth();
       if (formData.password !== formData.password_confirmation) {
         return alert("password do not match");
       }
-      const user = await createUser(formData.email, formData.password);
-      console.log(user);
-      if (user) {
-        nav("/login");
-      } else {
-      }
+      await createUserWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      ).then((userCredential) => {
+        const user = userCredential.user;
 
-      // await createUserWithEmailAndPassword(
-      //   auth,
-      //   formData.email,
-      //   formData.password
-      // ).then((userCredential) => {
-      //   const user = userCredential.user;
-      //   if (!user) {
-      //     alert("Failed");
-      //   } else {
-      //     nav("/login");
-      //   }
-      // });
+        if (user) {
+          nav("/login");
+        } else {
+          console.log("sign up error");
+        }
+      });
     } catch (error) {
       console.log(error.message);
       return alert("Failed to create an account");

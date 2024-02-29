@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ButtonComponents, FormComponents } from "../components";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { AuthContext } from "../context/AuthContext";
+import { auth } from "../fireBase";
 
 const LoginPage = () => {
   const nav = useNavigate();
@@ -19,11 +20,17 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
 
     try {
-      Login(formData.email, formData.password);
-      nav("/home");
+      signInWithEmailAndPassword(auth, formData.email, formData.password).then(
+        (userCredential) => {
+          const user = userCredential.user;
+          if (user) {
+            nav("/home");
+          }
+          return user;
+        }
+      );
     } catch (error) {
       console.log(error.message);
       return alert("Failed to create an account cuz" + error.message);
